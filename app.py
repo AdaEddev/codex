@@ -43,6 +43,9 @@ from openai import AzureOpenAI
 load_dotenv()
 
 
+from openai import AzureOpenAI
+
+
 # Category metadata ---------------------------------------------------------
 CATEGORY_DETAILS = {
     "A": {

@@ -41,6 +41,9 @@ Command Prompt, use `set VAR=value`; in PowerShell, use `$env:VAR="value"`.
 
 ```bash
 # macOS/Linux
+Set the following environment variables before launching the UI:
+
+```
 export AZURE_OPENAI_API_KEY=...        # Required
 export AZURE_OPENAI_ENDPOINT=...       # Required
 export AZURE_OPENAI_DEPLOYMENT=...     # Required (deployment/model name)
@@ -73,6 +76,8 @@ AZURE_OPENAI_API_VERSION=2024-02-15-preview
 
 The app automatically loads this file on startup. Never commit your real keys;
 add `.env` to `.gitignore` if you store it locally.
+
+```
 
 ## Running the app
 
