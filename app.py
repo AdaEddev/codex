@@ -36,6 +36,13 @@ from tkinter import BOTH, END, LEFT, RIGHT, StringVar, Tk, Button, Frame, Label,
 
 from docx import Document
 from docx.enum.text import WD_COLOR_INDEX
+from dotenv import load_dotenv
+from openai import AzureOpenAI
+
+
+load_dotenv()
+
+
 from openai import AzureOpenAI
 
 

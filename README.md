@@ -36,6 +36,11 @@ pip install -r requirements.txt
 After activating, run the commands below in the same shell so they use the
 virtual environment's Python and packages.
 
+Set the following environment variables before launching the UI. On Windows
+Command Prompt, use `set VAR=value`; in PowerShell, use `$env:VAR="value"`.
+
+```bash
+# macOS/Linux
 Set the following environment variables before launching the UI:
 
 ```
@@ -43,6 +48,35 @@ export AZURE_OPENAI_API_KEY=...        # Required
 export AZURE_OPENAI_ENDPOINT=...       # Required
 export AZURE_OPENAI_DEPLOYMENT=...     # Required (deployment/model name)
 export AZURE_OPENAI_API_VERSION=2024-02-15-preview  # Optional override
+
+# Windows (Command Prompt)
+set AZURE_OPENAI_API_KEY=...
+set AZURE_OPENAI_ENDPOINT=...
+set AZURE_OPENAI_DEPLOYMENT=...
+set AZURE_OPENAI_API_VERSION=2024-02-15-preview
+
+# Windows (PowerShell)
+$env:AZURE_OPENAI_API_KEY="..."
+$env:AZURE_OPENAI_ENDPOINT="..."
+$env:AZURE_OPENAI_DEPLOYMENT="..."
+$env:AZURE_OPENAI_API_VERSION="2024-02-15-preview"
+```
+
+### Using a `.env` file
+
+You can keep your Azure values in a local `.env` file instead of exporting
+variables each time. Create a file named `.env` next to `app.py` with:
+
+```
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=...
+AZURE_OPENAI_DEPLOYMENT=...
+AZURE_OPENAI_API_VERSION=2024-02-15-preview
+```
+
+The app automatically loads this file on startup. Never commit your real keys;
+add `.env` to `.gitignore` if you store it locally.
+
 ```
 
 ## Running the app
