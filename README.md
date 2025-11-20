@@ -22,6 +22,20 @@ color coding to the relevant passages.
 * `pip install -r requirements.txt`
 * Azure OpenAI resource with a deployed model such as GPT-4o mini
 
+### Recommended: Use a virtual environment
+
+Isolate the app dependencies to avoid conflicts with other projects on your
+machine:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
+```
+
+After activating, run the commands below in the same shell so they use the
+virtual environment's Python and packages.
+
 Set the following environment variables before launching the UI:
 
 ```
