@@ -35,7 +35,8 @@ from dataclasses import dataclass
 from tkinter import BOTH, END, LEFT, RIGHT, StringVar, Tk, Button, Frame, Label, Text, filedialog, messagebox, ttk
 
 from docx import Document
-from docx.enum.text import WD_COLOR_INDEX
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from dotenv import load_dotenv
 from openai import AzureOpenAI
 from openai import OpenAIError
@@ -48,35 +49,35 @@ load_dotenv()
 CATEGORY_DETAILS = {
     "A": {
         "title": "Background & Context",
-        "color": WD_COLOR_INDEX.YELLOW,  # soft yellow
+        "color": "FFF2CC",  # pastel yellow
     },
     "B": {
         "title": "Feasibility & Practical Implementation",
-        "color": WD_COLOR_INDEX.TURQUOISE,  # pastel aqua
+        "color": "DAEEF3",  # pale aqua
     },
     "C": {
         "title": "Validity & Learning Assurance",
-        "color": WD_COLOR_INDEX.BRIGHT_GREEN,  # light lime
+        "color": "E2F0D9",  # mint
     },
     "D": {
         "title": "Disciplinary Relevance",
-        "color": WD_COLOR_INDEX.PINK,  # blush pink
+        "color": "FCE4D6",  # blush peach
     },
     "E": {
         "title": "Student Engagement & Observations",
-        "color": WD_COLOR_INDEX.VIOLET,  # lavender
+        "color": "E4DFEC",  # light lavender
     },
     "F": {
         "title": "Reflection & Improvement",
-        "color": WD_COLOR_INDEX.TEAL,  # light teal
+        "color": "D9E1F2",  # periwinkle
     },
     "G": {
         "title": "Sustainability & Future Use",
-        "color": WD_COLOR_INDEX.GRAY_25,  # soft gray
+        "color": "F2F2F2",  # soft gray
     },
     "H": {
         "title": "Additional Insights",
-        "color": WD_COLOR_INDEX.GREEN,  # pale green
+        "color": "D5E8D4",  # pastel green
     },
 }
 
@@ -279,7 +280,7 @@ class TranscriptCoderApp:
             entry = document.add_paragraph()
             entry.add_run(f"{code}. {meta['title']} – ")
             swatch = entry.add_run("example")
-            swatch.font.highlight_color = meta["color"]
+            apply_shading(swatch, meta["color"])
 
     @staticmethod
     def _build_client() -> AzureOpenAI:
@@ -330,7 +331,22 @@ def chunk_text(paragraphs: list[str], max_chars: int = 3500) -> list[str]:
     return chunks
 
 
-def highlight_quote(document: Document, quote: str, color: WD_COLOR_INDEX) -> bool:
+def apply_shading(run, color_hex: str) -> None:
+    """Apply a pastel shading color to a run using a hex fill value."""
+
+    rpr = run._element.get_or_add_rPr()
+    # Remove any existing highlight elements to avoid layering colors.
+    for child in list(rpr):
+        if child.tag == qn("w:highlight"):
+            rpr.remove(child)
+
+    shd = OxmlElement("w:shd")
+    shd.set(qn("w:val"), "clear")
+    shd.set(qn("w:fill"), color_hex)
+    rpr.append(shd)
+
+
+def highlight_quote(document: Document, quote: str, color_hex: str) -> bool:
     """Highlight every paragraph containing the quote. Returns True if applied."""
 
     normalized = quote.strip()
@@ -345,7 +361,7 @@ def highlight_quote(document: Document, quote: str, color: WD_COLOR_INDEX) -> bo
             continue
         if normalized_lower in text.lower():
             for run in paragraph.runs:
-                run.font.highlight_color = color
+                apply_shading(run, color_hex)
             applied = True
     return applied
 

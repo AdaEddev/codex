@@ -41,9 +41,6 @@ Command Prompt, use `set VAR=value`; in PowerShell, use `$env:VAR="value"`.
 
 ```bash
 # macOS/Linux
-Set the following environment variables before launching the UI:
-
-```
 export AZURE_OPENAI_API_KEY=...        # Required
 export AZURE_OPENAI_ENDPOINT=...       # Required
 export AZURE_OPENAI_DEPLOYMENT=...     # Required (deployment/model name)
@@ -72,12 +69,6 @@ the placeholders with your real values):
 AZURE_OPENAI_API_KEY=your-azure-openai-key
 AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com
 AZURE_OPENAI_DEPLOYMENT=your-deployment-name
-variables each time. Create a file named `.env` next to `app.py` with:
-
-```
-AZURE_OPENAI_API_KEY=...
-AZURE_OPENAI_ENDPOINT=...
-AZURE_OPENAI_DEPLOYMENT=...
 AZURE_OPENAI_API_VERSION=2024-02-15-preview
 ```
 
@@ -101,7 +92,6 @@ endpoint`, double-check the following:
    `2024-02-15-preview` works for most GPT-4o models; override in `.env` if
    required).
 5. After editing `.env`, **restart the app** so it reloads the updated values.
-```
 
 ## Running the app
 
