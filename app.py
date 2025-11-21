@@ -3,14 +3,14 @@
 The app highlights relevant excerpts in a `.docx` transcript using the
 following categories:
 
-A. Background & Context
-B. Feasibility & Practical Implementation
-C. Validity & Learning Assurance
-D. Disciplinary Relevance
-E. Student Engagement & Observations
-F. Reflection & Improvement
-G. Sustainability & Future Use
-H. Additional Insights
+A. Background & Context — Course structure and participant role including assessment format and delivery.
+B. Feasibility & Practical Implementation — Practical, logistical, and administrative aspects of implementing oral assessment.
+C. Validity & Learning Assurance — Evidence that the oral assessment measured intended learning outcomes.
+D. Disciplinary Relevance — Fit between oral assessment and disciplinary norms, skills, and values.
+E. Student Engagement & Observations — Student reactions, fairness, and inclusivity observations.
+F. Reflection & Improvement — What worked, what did not, and what to change next time.
+G. Sustainability & Future Use — Whether this approach can be maintained, scaled, or used long term.
+H. Additional Insights — Open reflections, emergent, or unanticipated themes.
 
 The script requires the following environment variables so it can communicate
 with an Azure OpenAI deployment:
@@ -38,47 +38,45 @@ from docx import Document
 from docx.enum.text import WD_COLOR_INDEX
 from dotenv import load_dotenv
 from openai import AzureOpenAI
+from openai import OpenAIError
 
 
 load_dotenv()
-
-
-from openai import AzureOpenAI
 
 
 # Category metadata ---------------------------------------------------------
 CATEGORY_DETAILS = {
     "A": {
         "title": "Background & Context",
-        "color": WD_COLOR_INDEX.YELLOW,
+        "color": WD_COLOR_INDEX.YELLOW,  # soft yellow
     },
     "B": {
         "title": "Feasibility & Practical Implementation",
-        "color": WD_COLOR_INDEX.TURQUOISE,
+        "color": WD_COLOR_INDEX.TURQUOISE,  # pastel aqua
     },
     "C": {
         "title": "Validity & Learning Assurance",
-        "color": WD_COLOR_INDEX.BRIGHT_GREEN,
+        "color": WD_COLOR_INDEX.BRIGHT_GREEN,  # light lime
     },
     "D": {
         "title": "Disciplinary Relevance",
-        "color": WD_COLOR_INDEX.PINK,
+        "color": WD_COLOR_INDEX.PINK,  # blush pink
     },
     "E": {
         "title": "Student Engagement & Observations",
-        "color": WD_COLOR_INDEX.BLUE,
+        "color": WD_COLOR_INDEX.VIOLET,  # lavender
     },
     "F": {
         "title": "Reflection & Improvement",
-        "color": WD_COLOR_INDEX.RED,
+        "color": WD_COLOR_INDEX.TEAL,  # light teal
     },
     "G": {
         "title": "Sustainability & Future Use",
-        "color": WD_COLOR_INDEX.GRAY_50,
+        "color": WD_COLOR_INDEX.GRAY_25,  # soft gray
     },
     "H": {
         "title": "Additional Insights",
-        "color": WD_COLOR_INDEX.VIOLET,
+        "color": WD_COLOR_INDEX.GREEN,  # pale green
     },
 }
 
@@ -205,6 +203,8 @@ class TranscriptCoderApp:
                 applied = self._apply_highlights(document, matches)
                 self._log(f"Applied {applied} highlight(s).")
 
+            self._append_legend(document)
+
             document.save(self.output_path.get())
             self._log(f"Saved coded transcript to {self.output_path.get()}.")
             messagebox.showinfo("Done", "Processing complete!")
@@ -227,12 +227,18 @@ class TranscriptCoderApp:
                 ),
             },
         ]
-        response = self.client.chat.completions.create(
-            model=os.environ["AZURE_OPENAI_DEPLOYMENT"],
-            temperature=0,
-            response_format={"type": "json_object"},
-            messages=messages,
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model=os.environ["AZURE_OPENAI_DEPLOYMENT"],
+                temperature=0,
+                response_format={"type": "json_object"},
+                messages=messages,
+            )
+        except OpenAIError as exc:
+            raise RuntimeError(
+                "Azure OpenAI call failed. Please confirm your endpoint, "
+                "deployment name, API version, and key."
+            ) from exc
         content = response.choices[0].message.content
         try:
             parsed = json.loads(content)
@@ -264,20 +270,41 @@ class TranscriptCoderApp:
         self.log.insert(END, f"{message}\n")
         self.log.see(END)
 
+    def _append_legend(self, document: Document) -> None:
+        legend_title = document.add_paragraph()
+        legend_title_run = legend_title.add_run("Coding legend")
+        legend_title_run.bold = True
+
+        for code, meta in CATEGORY_DETAILS.items():
+            entry = document.add_paragraph()
+            entry.add_run(f"{code}. {meta['title']} – ")
+            swatch = entry.add_run("example")
+            swatch.font.highlight_color = meta["color"]
+
     @staticmethod
     def _build_client() -> AzureOpenAI:
-        missing = [
-            var
-            for var in ("AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT")
-            if not os.environ.get(var)
-        ]
+        missing = []
+        cleaned: dict[str, str] = {}
+        for var in ("AZURE_OPENAI_API_KEY", "AZURE_OPENAI_ENDPOINT", "AZURE_OPENAI_DEPLOYMENT"):
+            raw = os.environ.get(var, "").strip()
+            if not raw:
+                missing.append(var)
+            else:
+                cleaned[var] = raw
         if missing:
             message = "Missing Azure OpenAI environment variables: " + ", ".join(missing)
             raise EnvironmentError(message)
 
+        endpoint = cleaned["AZURE_OPENAI_ENDPOINT"].rstrip("/")
+        if not endpoint.startswith("https://"):
+            raise EnvironmentError(
+                "AZURE_OPENAI_ENDPOINT must include the full https URL, e.g. "
+                "https://my-resource.openai.azure.com"
+            )
+
         return AzureOpenAI(
-            api_key=os.environ["AZURE_OPENAI_API_KEY"],
-            azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
+            api_key=cleaned["AZURE_OPENAI_API_KEY"],
+            azure_endpoint=endpoint,
             api_version=os.environ.get("AZURE_OPENAI_API_VERSION", "2024-02-15-preview"),
         )
 

@@ -65,6 +65,13 @@ $env:AZURE_OPENAI_API_VERSION="2024-02-15-preview"
 ### Using a `.env` file
 
 You can keep your Azure values in a local `.env` file instead of exporting
+variables each time. Create a file named `.env` next to `app.py` with (replace
+the placeholders with your real values):
+
+```
+AZURE_OPENAI_API_KEY=your-azure-openai-key
+AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com
+AZURE_OPENAI_DEPLOYMENT=your-deployment-name
 variables each time. Create a file named `.env` next to `app.py` with:
 
 ```
@@ -77,6 +84,23 @@ AZURE_OPENAI_API_VERSION=2024-02-15-preview
 The app automatically loads this file on startup. Never commit your real keys;
 add `.env` to `.gitignore` if you store it locally.
 
+> Tip: remove any trailing slashes and extra spaces from the endpoint value.
+> It must start with `https://` (for example `https://my-resource.openai.azure.com`).
+
+### Troubleshooting 401 errors
+
+If you see `Access denied due to invalid subscription key or wrong API
+endpoint`, double-check the following:
+
+1. **API key** comes from the Azure OpenAI resource (not an OpenAI.com key).
+2. **Endpoint** uses the full `https://<resource>.openai.azure.com` URL and has
+   no trailing slash.
+3. **Deployment name** matches the model deployment in the Azure portal (often
+   `gpt-4o-mini` or the custom name you set).
+4. **API version** matches a supported preview date for your deployment (default
+   `2024-02-15-preview` works for most GPT-4o models; override in `.env` if
+   required).
+5. After editing `.env`, **restart the app** so it reloads the updated values.
 ```
 
 ## Running the app
