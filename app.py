@@ -49,27 +49,27 @@ load_dotenv()
 CATEGORY_DETAILS = {
     "A": {
         "title": "Background & Context",
-        "color": "FFF2CC",  # pastel yellow
+        "color": "FFFF70",  # warm pastel yellow
     },
     "B": {
         "title": "Feasibility & Practical Implementation",
-        "color": "DAEEF3",  # pale aqua
+        "color": "9EFAFF",  # light aqua
     },
     "C": {
         "title": "Validity & Learning Assurance",
-        "color": "E2F0D9",  # mint
+        "color": "C8FF96",  # mint green
     },
     "D": {
         "title": "Disciplinary Relevance",
-        "color": "FCE4D6",  # blush peach
+        "color": "FFD2BA",  # blush peach
     },
     "E": {
         "title": "Student Engagement & Observations",
-        "color": "E4DFEC",  # light lavender
+        "color": "F04AFF",  # bright pastel pink
     },
     "F": {
         "title": "Reflection & Improvement",
-        "color": "D9E1F2",  # periwinkle
+        "color": "E1A8CC",  # soft lilac
     },
     "G": {
         "title": "Sustainability & Future Use",
